@@ -12,3 +12,41 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model rawQuiz{
+  id          String   @id @default(uuid()) // Unique ID for each quiz
+  creatorId   String
+  questions   Question[] // One-to-many relation with questions
+  
+}
+
+model Quiz {
+  id          String   @id @default(uuid()) // Unique ID for each quiz
+  name        String
+  creatorId   String   // Unique identifier for the creator (could be a random hash)
+  title       String?   // Quiz title
+  questions   Question[] // One-to-many relation with questions
+  leaderboard LeaderboardEntry?
+  createdAt   DateTime @default(now()) // Timestamp for creation
+}
+
+model Question {
+  id        String   @id @default(uuid())
+  quizId    String 
+  rawdataId String
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  rawdata   rawQuiz     @relation(fields: [rawdataId], references: [id], onDelete: Cascade) 
+  text      String   // Question text
+  options   String[] // Multiple choice options
+  correctAnswer String? // Correct answer
+  selected  Boolean
+}
+
+model LeaderboardEntry {
+  id        String   @id @default(uuid())
+  quizId    String @unique   
+  quiz      Quiz   @relation(fields: [quizId], references: [id])
+  playerName String  // Name of the friend who attempted
+  score     Int      // Score achieved
+  createdAt DateTime @default(now())
+}
