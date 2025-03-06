@@ -15,9 +15,8 @@ datasource db {
 
 model rawQuiz{
   id          String   @id @default(uuid()) // Unique ID for each quiz
-  creatorId   String
-  questions   Question[] // One-to-many relation with questions
-  
+  creatorId   String @unique
+  questions   rawQuestion[] // One-to-many relation with questions 
 }
 
 model Quiz {
@@ -31,15 +30,22 @@ model Quiz {
 }
 
 model Question {
-  id        String   @id @default(uuid())
+  id        Int   @id @default(autoincrement())
   quizId    String 
-  rawdataId String
   quiz      Quiz     @relation(fields: [quizId], references: [id])
-  rawdata   rawQuiz     @relation(fields: [rawdataId], references: [id], onDelete: Cascade) 
   text      String   // Question text
   options   String[] // Multiple choice options
   correctAnswer String? // Correct answer
+}
+
+model rawQuestion{
+  id        Int   @id @default(autoincrement())
+  creatorId String
+  rawquiz   rawQuiz     @relation(fields: [creatorId], references: [creatorId], onDelete: Cascade) 
   selected  Boolean
+  text      String   // Question text
+  options   String[]
+
 }
 
 model LeaderboardEntry {
