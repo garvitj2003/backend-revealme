@@ -21,6 +21,28 @@ generateQuiz.use("/*", async (c, next) => {
 
 generateQuiz.post("/", async (c) => {
   const prisma = c.get("prisma");
-  const { creatorID, name, questions, title } = await c.req.json();
-  const quiz = await prisma.quiz.create;
+  const { creatorId, name, questions, title } = await c.req.json();
+  try {
+    const quiz = await prisma.quiz.create({
+      data: {
+        creatorId,
+        name,
+        title,
+      },
+    });
+
+    const finalQuestion = questions.map((question: any) => {
+      return {
+        ...question,
+        quizId: quiz.id,
+      };
+    });
+    const question = await prisma.question.createMany({
+      data: finalQuestion,
+    });
+    return c.json({ success: true, data: quiz, question });
+  } catch (e) {
+    console.log(e);
+    return c.json({ success: false, status: 411 });
+  }
 });

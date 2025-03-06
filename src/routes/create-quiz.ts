@@ -28,7 +28,7 @@ createQuiz.post("/", async (c) => {
         creatorId: creatorId,
       },
     });
-    const finalQuestions = questions.map((question: object) => {
+    const finalQuestions = questions.map((question: any) => {
       return {
         ...question,
         creatorId,
