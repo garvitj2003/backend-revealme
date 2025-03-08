@@ -14,13 +14,13 @@ datasource db {
 }
 
 model rawQuiz{
-  id          String   @id @default(uuid()) // Unique ID for each quiz
+  id          Int   @id @default(autoincrement()) // Unique ID for each quiz
   creatorId   String @unique
   questions   rawQuestion[] // One-to-many relation with questions 
 }
 
 model Quiz {
-  id          String   @id @default(uuid()) // Unique ID for each quiz
+  id          Int   @id @default(autoincrement()) // Unique ID for each quiz
   name        String
   creatorId   String   // Unique identifier for the creator (could be a random hash)
   title       String?   // Quiz title
@@ -31,7 +31,7 @@ model Quiz {
 
 model Question {
   id        Int   @id @default(autoincrement())
-  quizId    String 
+  quizId    Int 
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   text      String   // Question text
   options   String[] // Multiple choice options
@@ -50,9 +50,14 @@ model rawQuestion{
 
 model LeaderboardEntry {
   id        String   @id @default(uuid())
-  quizId    String @unique   
+  quizId    Int @unique   
   quiz      Quiz   @relation(fields: [quizId], references: [id])
   playerName String  // Name of the friend who attempted
   score     Int      // Score achieved
   createdAt DateTime @default(now())
+}
+
+model stats {
+  id    Int @id @default(autoincrement())
+  total_submission Int @default(0)
 }
