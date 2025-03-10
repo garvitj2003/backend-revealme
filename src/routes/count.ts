@@ -19,13 +19,14 @@ count.use("/*", async (c, next) => {
   await next();
 });
 
-count.post("/submit", async (c) => {
+count.put("/submit", async (c) => {
   const prisma = c.get("prisma");
   try {
     await prisma.stats.update({
       where: { id: 1 },
-      data: { total_submssion: { increment: 1 } },
+      data: { total_submission: { increment: 1 } },
     });
+    return c.json({ success: true });
   } catch (error) {
     console.log(error);
   }

@@ -18,7 +18,21 @@ createQuiz.use("/*", async (c, next) => {
   c.set("prisma", prisma);
   await next();
 });
-
+createQuiz.get("/", async (c) => {
+  const body = await c.req.json();
+  const prisma = c.get("prisma");
+  try {
+    const rawQuiz = await prisma.rawQuiz.findUnique({
+      where: { creatorId: body.creatorId },
+      include: {
+        questions: true,
+      },
+    });
+    return c.json({ data: rawQuiz });
+  } catch (error) {
+    return c.json({ success: false });
+  }
+});
 createQuiz.post("/", async (c) => {
   const { creatorId, questions } = await c.req.json();
   const prisma = c.get("prisma");

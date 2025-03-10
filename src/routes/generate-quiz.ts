@@ -19,6 +19,25 @@ generateQuiz.use("/*", async (c, next) => {
   await next();
 });
 
+generateQuiz.get("/", async (c) => {
+  const prisma = c.get("prisma");
+  const quizId = await c.req.json();
+  try {
+    const quiz = await prisma.quiz.findUnique({
+      where: {
+        id: quizId.id,
+      },
+      include: {
+        questions: true,
+      },
+    });
+    return c.json({ data: quiz });
+  } catch (error) {
+    c.json({ success: false });
+    console.log(error);
+  }
+});
+
 generateQuiz.post("/", async (c) => {
   const prisma = c.get("prisma");
   const { creatorId, name, questions, title } = await c.req.json();
@@ -40,7 +59,7 @@ generateQuiz.post("/", async (c) => {
     const question = await prisma.question.createMany({
       data: finalQuestion,
     });
-    return c.json({ success: true, data: quiz, question });
+    return c.json({ success: true, data: quiz, finalQuestion });
   } catch (e) {
     console.log(e);
     return c.json({ success: false, status: 411 });
