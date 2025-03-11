@@ -19,11 +19,11 @@ createQuiz.use("/*", async (c, next) => {
   await next();
 });
 createQuiz.get("/", async (c) => {
-  const body = await c.req.json();
+  const creatorId = c.req.query("creatorId");
   const prisma = c.get("prisma");
   try {
     const rawQuiz = await prisma.rawQuiz.findUnique({
-      where: { creatorId: body.creatorId },
+      where: { creatorId },
       include: {
         questions: true,
       },

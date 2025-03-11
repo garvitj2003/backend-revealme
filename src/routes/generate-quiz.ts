@@ -21,11 +21,11 @@ generateQuiz.use("/*", async (c, next) => {
 
 generateQuiz.get("/", async (c) => {
   const prisma = c.get("prisma");
-  const quizId = await c.req.json();
+  const quizId = c.req.query("quizId");
   try {
     const quiz = await prisma.quiz.findUnique({
       where: {
-        id: quizId.id,
+        id: quizId,
       },
       include: {
         questions: true,
