@@ -10,17 +10,10 @@ const app = new Hono<{
   };
 }>();
 
-const allowedOrigins = [
-  "http://localhost:3000",
-  "https://knowyourfriends.vercel.app",
-];
-
 app.use(
   "/*",
   cors({
-    origin: (origin) => (allowedOrigins.includes(origin) ? origin : undefined),
-    allowMethods: ["GET", "POST", "OPTIONS", "PUT"],
-    allowHeaders: ["Content-Type", "Authorization"],
+    origin: ["http://localhost:3000", "https://knowyourfriends.vercel.app"],
   })
 );
 app.route("/api/v1/create-quiz", createQuiz);
