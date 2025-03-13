@@ -25,11 +25,14 @@ createQuiz.get("/", async (c) => {
     const rawQuiz = await prisma.rawQuiz.findUnique({
       where: { creatorId },
       include: {
-        questions: true,
+        questions: {
+          select: { id: true, text: true, selected: true, options: true },
+        },
       },
     });
     return c.json({ data: rawQuiz });
   } catch (error) {
+    console.log(error);
     return c.json({ success: false });
   }
 });
