@@ -20,7 +20,7 @@ model rawQuiz{
 }
 
 model Quiz {
-  id          Int   @id @default(autoincrement()) // Unique ID for each quiz
+  id          String   @id @default(uuid()) // Unique ID for each quiz
   name        String
   creatorId   String   // Unique identifier for the creator (could be a random hash)
   title       String?   // Quiz title
@@ -31,7 +31,7 @@ model Quiz {
 
 model Question {
   id        Int   @id @default(autoincrement())
-  quizId    Int 
+  quizId    String 
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   text      String   // Question text
   options   String[] // Multiple choice options
@@ -50,7 +50,7 @@ model rawQuestion{
 
 model LeaderboardEntry {
   id        String   @id @default(uuid())
-  quizId    Int @unique   
+  quizId    String @unique   
   quiz      Quiz   @relation(fields: [quizId], references: [id])
   playerName String  // Name of the friend who attempted
   score     Int      // Score achieved
