@@ -17,7 +17,7 @@ app.use(
     origin: [
       "http://localhost:3000",
       "https://knowyourfriends.vercel.app",
-      "https://quiz-me.vercel.app",
+      "https://quiz-on-me.vercel.app",
     ],
   })
 );
