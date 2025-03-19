@@ -23,9 +23,9 @@ LeaderBoard.get("/", async (c) => {
   const prisma = c.get("prisma");
   const quizId = c.req.query("quizId");
   try {
-    const leaderboard = await prisma.LeaderboardEntry.findUnique({
+    const leaderboard = await prisma.LeaderboardEntry.findMany({
       where: {
-        id: quizId,
+        quizId,
       },
     });
     return c.json({ success: true, data: leaderboard });
