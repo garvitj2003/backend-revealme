@@ -14,7 +14,11 @@ const app = new Hono<{
 app.use(
   "/*",
   cors({
-    origin: ["http://localhost:3000", "https://knowyourfriends.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://knowyourfriends.vercel.app",
+      "https://quiz-me.vercel.app",
+    ],
   })
 );
 app.route("/api/v1/create-quiz", createQuiz);
