@@ -27,6 +27,9 @@ LeaderBoard.get("/", async (c) => {
       where: {
         quizId,
       },
+      orderBy: {
+        score: "desc",
+      },
     });
     return c.json({ success: true, data: leaderboard });
   } catch (error) {
