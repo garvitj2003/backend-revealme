@@ -40,7 +40,7 @@ LeaderBoard.get("/", async (c) => {
 
 LeaderBoard.post("/", async (c) => {
   const prisma = c.get("prisma");
-  const { quizId, score, playerName } = await c.req.json();
+  const { quizId, score, playerName, responses } = await c.req.json();
 
   try {
     const leaderboard = await prisma.LeaderboardEntry.create({
@@ -50,7 +50,17 @@ LeaderBoard.post("/", async (c) => {
         playerName,
       },
     });
-    return c.json({ success: true, data: leaderboard });
+
+    const finalResponses = responses.map((res: any) => {
+      return {
+        ...res,
+        leaderBoardId: leaderboard.id,
+      };
+    });
+    const response = await prisma.Response.createMany({
+      data: finalResponses,
+    });
+    return c.json({ success: true, data: leaderboard, response });
   } catch (error) {
     console.log(error);
     return c.json({ success: false });

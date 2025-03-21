@@ -49,15 +49,24 @@ model rawQuestion{
 }
 
 model LeaderboardEntry {
-  id        String   @id @default(uuid())
+  id        Int   @id @default(autoincrement())
   quizId    String    
   quiz      Quiz   @relation(fields: [quizId], references: [id])
   playerName String  // Name of the friend who attempted
   score     Int      // Score achieved
   createdAt DateTime @default(now())
+  responses Response[]
 }
 
 model stats {
   id    Int @id @default(autoincrement())
   total_submission Int @default(0)
+}
+
+model Response{
+  id Int @default(autoincrement()) @id
+  leaderBoardId Int
+  leaderBoardEntry LeaderboardEntry @relation(fields: [leaderBoardId], references: [id])
+  questionId Int @unique
+  answerChosen String
 }
