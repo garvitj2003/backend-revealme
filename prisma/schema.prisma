@@ -67,6 +67,7 @@ model Response{
   id Int @default(autoincrement()) @id
   leaderBoardId Int
   leaderBoardEntry LeaderboardEntry @relation(fields: [leaderBoardId], references: [id])
-  questionId Int @unique
+  questionId Int
+  @@unique([leaderBoardId, questionId])
   answerChosen String
 }

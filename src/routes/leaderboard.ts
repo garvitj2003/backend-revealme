@@ -30,6 +30,9 @@ LeaderBoard.get("/", async (c) => {
       orderBy: {
         score: "desc",
       },
+      include: {
+        responses: true,
+      },
     });
     return c.json({ success: true, data: leaderboard });
   } catch (error) {
