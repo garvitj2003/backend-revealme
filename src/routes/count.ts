@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client/edge";
 import { Hono } from "hono";
+import { cache } from "hono/cache";
 import { withAccelerate } from "@prisma/extension-accelerate";
 
 export const count = new Hono<{
@@ -19,29 +20,23 @@ count.use("/*", async (c, next) => {
   await next();
 });
 
-count.put("/submit", async (c) => {
-  const prisma = c.get("prisma");
-  try {
-    await prisma.stats.update({
-      where: { id: 1 },
-      data: { total_submission: { increment: 1 } },
-    });
-    return c.json({ success: true });
-  } catch (error) {
-    console.log(error);
+// Apply Hono's built-in cache middleware to the /total endpoint
+count.get("/total", 
+  cache({
+    cacheName: "count-cache", 
+    cacheControl: "max-age=900, stale-while-revalidate=60", // 15 minutes with 1 minute stale
+    vary: ["Accept"],
+  }),
+  async (c) => {
+    const prisma = c.get("prisma");
+    try {
+      const quizCount = await prisma.quiz.count();
+      const submitCount = await prisma.LeaderboardEntry.count();
+      const totalCount = quizCount + submitCount;
+      return c.json({ count: totalCount });
+    } catch (error) {
+      console.log(error);
+      return c.json({ error: "Failed to fetch counts" }, 500);
+    }
   }
-});
-
-count.get("/total", async (c) => {
-  const prisma = c.get("prisma");
-  try {
-    const quizCount = await prisma.quiz.count();
-    const submitCount = await prisma.stats.findUnique({
-      where: { id: 1 },
-    });
-    const totalCount = quizCount + submitCount?.total_submission;
-    return c.json({ count: totalCount });
-  } catch (error) {
-    console.log(error);
-  }
-});
+);

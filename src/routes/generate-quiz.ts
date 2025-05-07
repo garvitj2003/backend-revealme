@@ -1,6 +1,7 @@
 import { Prisma, PrismaClient } from "@prisma/client/edge";
 import { Hono } from "hono";
 import { withAccelerate } from "@prisma/extension-accelerate";
+import { cache } from "hono/cache";
 
 export const generateQuiz = new Hono<{
   Bindings: {
@@ -19,24 +20,32 @@ generateQuiz.use("/*", async (c, next) => {
   await next();
 });
 
-generateQuiz.get("/", async (c) => {
-  const prisma = c.get("prisma");
-  const quizId = c.req.query("quizId");
-  try {
-    const quiz = await prisma.quiz.findUnique({
-      where: {
-        id: quizId,
-      },
-      include: {
-        questions: true,
-      },
-    });
-    return c.json({ data: quiz });
-  } catch (error) {
-    c.json({ success: false });
-    console.log(error);
+generateQuiz.get(
+  "/",
+  cache({
+    cacheName: "quiz-cache",
+    cacheControl: "max-age=3600, stale-while-revalidate=60", // 1 hour with 1 minute stale
+    vary: ["Accept"],
+  }),
+  async (c) => {
+    const prisma = c.get("prisma");
+    const quizId = c.req.query("quizId");
+    try {
+      const quiz = await prisma.quiz.findUnique({
+        where: {
+          id: quizId,
+        },
+        include: {
+          questions: true,
+        },
+      });
+      return c.json({ data: quiz });
+    } catch (error) {
+      c.json({ success: false });
+      console.log(error);
+    }
   }
-});
+);
 
 generateQuiz.post("/", async (c) => {
   const prisma = c.get("prisma");
